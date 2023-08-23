@@ -217,6 +217,9 @@ class RootMeBot():
             """<scoreboard name>"""
 
             args = ' '.join(self.get_command_args(context))
+            if args == '':
+                await utils.cant_create_scoreboard(context.message.channel)
+                return
 
             scoreboard = await self.database_manager.get_scoreboard(args)
             if not scoreboard:

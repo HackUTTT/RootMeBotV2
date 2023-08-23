@@ -158,7 +158,14 @@ async def cant_find_scoreboard(channel: TextChannel, data: str) -> None:
 
     await channel.send(embed=embed)
 
+async def cant_create_scoreboard(channel: TextChannel) -> None:
 
+    message_title = 'Error'
+    message = f'Cant create scoreboard with empty name :frowning:'
+
+    embed = discord.Embed(color=Color.ERROR_RED.value, title=message_title, description=message)
+
+    await channel.send(embed=embed)
 
 async def removed_ok(channel: TextChannel, username: str) -> None:
 
