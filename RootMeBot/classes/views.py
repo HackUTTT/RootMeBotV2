@@ -78,6 +78,7 @@ class DropdownScoreboard(discord.ui.Select):
         super().__init__(placeholder='Choose the scoreboard', min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Button clicked")
         await self.view.show_scoreboard(self.values[0])
 
 class ScoreboardView(discord.ui.View):
@@ -104,6 +105,7 @@ class MultipleChallButton(discord.ui.Select):
         super().__init__(placeholder='Choose the challenge', min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Button clicked")
         await self.view.show_challenge(self.values[0])
 
 class MultipleChallFoundView(discord.ui.View):
@@ -129,6 +131,7 @@ class MultipleUserButton(discord.ui.Select):
         super().__init__(placeholder='Which user :', min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction): 
+        await interaction.response.send_message("Button clicked")
         await self.view.add_user(self.values[0])
 
 class MultipleUserFoundView(discord.ui.View):

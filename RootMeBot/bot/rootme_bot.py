@@ -93,10 +93,9 @@ class RootMeBot():
         while not self.init_done:
             await asyncio.sleep(1)
 
-        #while True:
-
-            #await self.database_manager.update_challenges()
-            #await asyncio.sleep(3600)
+        while True:
+            await self.database_manager.update_challenges()
+            await asyncio.sleep(3600)
 
         print("OK challs")
 
@@ -112,6 +111,7 @@ class RootMeBot():
 
         while True:
             await self.database_manager.update_users()
+            await asyncio.sleep(30)
 
     def catch(self):
         """Catch discord event"""
