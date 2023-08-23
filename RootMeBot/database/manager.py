@@ -29,7 +29,7 @@ class DatabaseManager():
         self.rootme_api = rootme_api
         self.notification_manager = notification_manager
 
-        self.engine = create_engine(f"sqlite://{database_path}", connect_args={'timeout': 15})
+        self.engine = create_engine(f"sqlite://{database_path}", connect_args={'timeout': 15}, pool_size=10, max_overflow=20)
         Base.metadata.create_all(bind=self.engine)
 
         self.session_maker = sessionmaker(self.engine, expire_on_commit=False)
