@@ -6,6 +6,8 @@ from json.decoder import JSONDecodeError
 import functools
 import uuid
 from datetime import datetime, timedelta
+import random
+import string
 
 from asyncio.exceptions import TimeoutError
 from aiohttp.client_exceptions import ServerDisconnectedError, ClientConnectorError, ClientPayloadError, ClientOSError
@@ -44,6 +46,8 @@ class ApiRootMe():
         self.lang = DEFAULT_LANG
         self.timeout = aiohttp.ClientTimeout(total=6)
         self.ban = datetime.now()
+        self.userAgent = 'RootMeBotV2-' + ''.join(random.choice(string.ascii_uppercase) for i in range(8))
+        self.reqHeaders = {'User-Agent':self.userAgent,"cache-control": "max-age=0"}
 
         self.queue = asyncio.PriorityQueue()
 
@@ -72,10 +76,10 @@ class ApiRootMe():
 
 
 
-                await asyncio.sleep(4.5)
+                await asyncio.sleep(1)
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] Treating item in queue : {key} -> {url} + {params} - (Priority {prio})")
                 try:
-                    async with method_http(url, params=params, cookies=cookies_rootme) as r:
+                    async with method_http(url, params=params, cookies=cookies_rootme, headers=self.reqHeaders) as r:
 
                         # HEAD
                         if method == 'HEAD':
@@ -164,7 +168,7 @@ class ApiRootMe():
         """Retreives an Auteur by id"""
 
         params = {
-            str(int(time.time())): str(int(time.time())),
+            #str(int(time.time())): str(int(time.time())),
             }
 
 
@@ -178,7 +182,7 @@ class ApiRootMe():
         params = {
             'nom' : username,
             'count': str(start),
-            str(int(time.time())): str(int(time.time())),
+            #str(int(time.time())): str(int(time.time())),
             'lang': self.lang
             }
 
@@ -200,7 +204,7 @@ class ApiRootMe():
         """Retrieves all challenges given a starting number"""
 
         params = {
-            str(int(time.time())): str(int(time.time())),
+            #str(int(time.time())): str(int(time.time())),
             'debut_challenges': str(start),
             'lang': DEFAULT_LANG
             }
@@ -229,12 +233,15 @@ class ApiRootMe():
         """Retreives all information about a challenge by ID"""
 
         params = {
-            str(int(time.time())): str(int(time.time())),
+            #str(int(time.time())): str(int(time.time())),
             'lang': DEFAULT_LANG
             }
 
         challenge_data = await self.get(f"{api_base_url}{challenges_path}/{idx}", params, priority)
         challenge = extract_challenge(challenge_data, idx)
+        if challenge == None:
+            print('ERROR',challenge_data)
+            
         return challenge
 
     async def get_image_png(self, idx: int) -> str:

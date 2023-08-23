@@ -79,6 +79,10 @@ class DatabaseManager():
                 print(f"Could not retreive premium challenge {idx}")
                 return
 
+            if full_chall == None:
+                print('Error in challenge')
+                return
+
             with self.session_maker.begin() as session: # type: ignore
                 if temp_chall := session.query(Challenge.idx).filter(Challenge.idx == full_chall.idx).one_or_none():
                     if temp_chall.score != full_chall.score:
