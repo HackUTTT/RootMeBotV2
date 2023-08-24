@@ -4,7 +4,7 @@ import asyncio
 import discord
 import utils.messages as utils
 from classes.error import *
-from constants import BOT_PREFIX
+from constants import BOT_PREFIX, UPDATE_CHALL_DELAY, UPDATE_USERS_DELAY
 from database.manager import DatabaseManager
 from discord import Embed
 from discord.ext import commands
@@ -102,7 +102,7 @@ class RootMeBot():
             except Exception as e:
                 channel = self.bot.get_channel(self.BOT_CHANNEL)
                 await utils.panic_message(channel, e, "challs worker")
-            await asyncio.sleep(3600)
+            await asyncio.sleep(UPDATE_CHALL_DELAY)
 
         print("OK challs")
 
@@ -122,7 +122,7 @@ class RootMeBot():
             except Exception as e:
                 channel = self.bot.get_channel(self.BOT_CHANNEL)
                 await utils.panic_message(channel, e, "solves worker")
-            await asyncio.sleep(30)
+            await asyncio.sleep(UPDATE_USERS_DELAY)
 
     def catch(self):
         """Catch discord event"""

@@ -76,7 +76,7 @@ class ApiRootMe():
 
 
 
-                await asyncio.sleep(1)
+                await asyncio.sleep(API_REQ_DELAY)
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] Treating item in queue : {key} -> {url} + {params} - (Priority {prio})")
                 try:
                     async with method_http(url, params=params, cookies=cookies_rootme, headers=self.reqHeaders) as r:
