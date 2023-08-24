@@ -20,7 +20,7 @@ class RootMeBot():
 
         self.intents = discord.Intents.all()
         self.description = """A discord bot to keep up with your progression on www.root-me.org"""
-        self.bot = commands.Bot(command_prefix=BOT_PREFIX, description=self.description, intents=self.intents)
+        self.bot = commands.Bot(command_prefix=BOT_PREFIX, description=self.description, intents=self.intents, allowed_mentions=discord.AllowedMentions(users=True))
 
         self.notification_manager = notification_manager
         self.database_manager = database_manager
@@ -74,14 +74,17 @@ class RootMeBot():
         channel = self.bot.get_channel(self.BOT_CHANNEL)
 
         while True:
+            try:
+                for aut, chall, score_above, is_blood in self.notification_manager.get_solve_queue():
+                    if chall:
+                        await utils.send_new_solve(channel, chall, aut, score_above, is_blood)
 
-            for aut, chall, score_above, is_blood in self.notification_manager.get_solve_queue():
-                if chall:
-                    await utils.send_new_solve(channel, chall, aut, score_above, is_blood)
 
-
-            for chall in self.notification_manager.get_chall_queue():
-                await utils.send_new_challenge(channel, chall)
+                for chall in self.notification_manager.get_chall_queue():
+                    await utils.send_new_challenge(channel, chall)
+            except Exception as e:
+                channel = self.bot.get_channel(self.BOT_CHANNEL)
+                await utils.panic_message(channel, e, "display worker")
 
             await asyncio.sleep(1)
 
@@ -94,7 +97,11 @@ class RootMeBot():
             await asyncio.sleep(1)
 
         while True:
-            await self.database_manager.update_challenges()
+            try:
+                await self.database_manager.update_challenges()
+            except Exception as e:
+                channel = self.bot.get_channel(self.BOT_CHANNEL)
+                await utils.panic_message(channel, e, "challs worker")
             await asyncio.sleep(3600)
 
         print("OK challs")
@@ -110,7 +117,11 @@ class RootMeBot():
         print("OK solves")
 
         while True:
-            await self.database_manager.update_users()
+            try:
+                await self.database_manager.update_users()
+            except Exception as e:
+                channel = self.bot.get_channel(self.BOT_CHANNEL)
+                await utils.panic_message(channel, e, "solves worker")
             await asyncio.sleep(30)
 
     def catch(self):

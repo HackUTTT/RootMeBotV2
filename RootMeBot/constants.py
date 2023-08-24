@@ -24,3 +24,4 @@ LOG_PATH = "/opt/db/log.txt"
 
 PING_ROLE_ROOTME = getenv("PING_ROLE_ROOTME")
 BOT_PREFIX = "!"
+PING_DEV = getenv("PING_DEV")

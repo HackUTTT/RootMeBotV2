@@ -16,10 +16,6 @@ TOKEN = getenv('DISCORD_TOKEN')
 GUILD = getenv('DISCORD_GUILD')
 CHANNEL = int(getenv('BOT_CHANNEL'))
 
-intents = discord.Intents.default()
-intents.message_content = True
-client = discord.Client(intents=intents)
-
 
 async def main():
     rootme_api = ApiRootMe( )

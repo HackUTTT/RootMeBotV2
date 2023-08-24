@@ -1,6 +1,7 @@
 import discord
 import aiohttp
 import code
+import traceback
 from html import unescape
 
 from discord.utils import escape_markdown
@@ -10,7 +11,7 @@ from database.manager import DatabaseManager
 
 from classes.enums import Color, Stats
 from classes.views import ManageView, ScoreboardView, MultipleChallFoundView, MultipleUserFoundView
-from constants import PING_ROLE_ROOTME
+from constants import PING_DEV, PING_ROLE_ROOTME
 
 from database.models.auteur_model import Auteur
 from database.models.scoreboard_model import Scoreboard
@@ -49,6 +50,15 @@ async def init_end(channel: TextChannel) -> None:
     embed = discord.Embed(color=Color.INFO_BLUE.value, title=message_title, description=message)
     await channel.send(embed=embed)
 
+async def panic_message(channel: TextChannel, error, where):
+    """Send panic message"""
+    ping = f'<@{PING_DEV}>'
+    message_title = ":fire: Kernel Panic :fire:"
+    message = f"ERROR in **{where}**"
+    message += f'\n Type {type(error)}: **{error}**'
+    message += f'\n\n'+"".join(traceback.format_exception(type(error), error, error.__traceback__))#{traceback.format_tb(error.__traceback__)}'
+    embed = discord.Embed(color=Color.ERROR_RED.value, title=message_title, description=message)
+    await channel.send(ping,embed=embed)
 
 
 async def send_new_solve(channel: TextChannel, chall: Challenge, aut: Auteur, above: tuple[str, int], is_blood: bool) -> None:
