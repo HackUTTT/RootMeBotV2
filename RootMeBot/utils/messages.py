@@ -53,12 +53,26 @@ async def init_end(channel: TextChannel) -> None:
 async def panic_message(channel: TextChannel, error, where):
     """Send panic message"""
     ping = f'<@{PING_DEV}>'
-    message_title = ":fire: Kernel Panic :fire:"
     message = f"ERROR in **{where}**"
-    message += f'\n Type {type(error)}: **{error}**'
-    message += f'\n\n'+"".join(traceback.format_exception(type(error), error, error.__traceback__))#{traceback.format_tb(error.__traceback__)}'
-    embed = discord.Embed(color=Color.ERROR_RED.value, title=message_title, description=message)
-    await channel.send(ping,embed=embed)
+    message += f'\n Type {type(error)}: **{error}**\n\n'
+    error_msg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+
+    limit = 4096 - len(message)
+    if len(error_msg) > limit:
+        nb = (len(error_msg)//limit)+1
+        for i in range(nb):
+            message_title = f":fire: Kernel Panic {i+1}/{nb} :fire:"
+            the_message = message + error_msg[:min([limit, len(error_msg)])]
+            print('len',len(the_message))
+            embed = discord.Embed(color=Color.ERROR_RED.value, title=message_title, description=the_message)
+            await channel.send(ping,embed=embed)
+            error_msg = error_msg[min([limit, len(error_msg)]):]
+            message_title = f":fire: Kernel Panic {1}/{(len(error_msg)//1024)+1} :fire:"
+    else:
+        message_title = ":fire: Kernel Panic :fire:"
+        message += f'\n\n'+error_msg
+        embed = discord.Embed(color=Color.ERROR_RED.value, title=message_title, description=message)
+        await channel.send(ping,embed=embed)
 
 
 async def send_new_solve(channel: TextChannel, chall: Challenge, aut: Auteur, above: tuple[str, int], is_blood: bool) -> None:
