@@ -173,8 +173,12 @@ class RootMeBot():
 
             args = self.get_command_args(context)
             if len(args) < 1:
-                await utils.scoreboard_choice(context.message.channel, self.database_manager)
-                return
+                scoreboards = self.database_manager.get_all_scoreboards()
+                if len(scoreboards) == 1:
+                    await utils.scoreboard(context.message.channel, self.database_manager, scoreboards[0].name)
+                else:
+                    await utils.scoreboard_choice(context.message.channel, self.database_manager)
+                    return
             else:
                 name = ' '.join(args)
                 await utils.scoreboard(context.message.channel, self.database_manager, name)
