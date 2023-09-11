@@ -11,6 +11,7 @@ from constants import database_path
 from notify.manager import NotificationManager
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import make_transient, sessionmaker
+from sqlalchemy.sql import text
 
 from database.models.auteur_model import Auteur
 from database.models.base_model import Base
@@ -322,6 +323,16 @@ class DatabaseManager():
             if not scoreboard:
                 scoreboard = Scoreboard(name=name)
                 session.add(scoreboard)
+        return scoreboard
+    
+    async def get_daily_scoreboard(self) -> Scoreboard:
+        """Creates a scoreboard """
+        try:
+            with self.session_maker.begin() as session: # type: ignore
+                scoreboard = session.execute(text("select a.username,sum(c.score) from validations as v,auteurs as a, challenges as c where SUBSTR(v.date,0,11)==DATE('now') and v.auteur_id==a.idx and v.challenge_id==c.idx group by 1;")).fetchall()
+            print('sc2',scoreboard)
+        except Exception as e:
+            print(e)
         return scoreboard
 
     async def remove_scoreboard(self, name: str) -> bool:

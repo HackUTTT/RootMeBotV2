@@ -122,6 +122,13 @@ async def scoreboard_choice(channel: TextChannel, db_manager: DatabaseManager) -
     view = ScoreboardView(channel, db_manager)
     await channel.send('Choose which scoreboard: ', view=view)
 
+async def daily_scoreboard(channel: TextChannel, scoreboard) -> None:
+    scoreboard.sort(key=lambda x: x[1], reverse=True)
+    message = ''
+    for user in scoreboard:
+        message += f' • • • {escape_markdown(user[0])} --> {user[1]} \n'
+    embed = discord.Embed(color=Color.SCOREBOARD_WHITE.value, title="Daily Scoreboard", description=message)
+    await channel.send(embed=embed)
 
 async def scoreboard(channel: TextChannel, database_manager: DatabaseManager, name: str) -> None:
 

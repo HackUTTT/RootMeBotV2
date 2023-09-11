@@ -182,6 +182,16 @@ class RootMeBot():
             else:
                 name = ' '.join(args)
                 await utils.scoreboard(context.message.channel, self.database_manager, name)
+        
+        @self.bot.command(description='Today\'s scoreboard')
+        @commands.check(self.after_init)
+        @self.check_channel()
+        async def today(context: Context) -> None:
+            """ """
+            print('Today')
+            scoreboard = await self.database_manager.get_daily_scoreboard()
+            await utils.daily_scoreboard(context.message.channel, scoreboard)
+
 
         @self.bot.command(description='Add user by ID')
         @commands.check(self.after_init)
