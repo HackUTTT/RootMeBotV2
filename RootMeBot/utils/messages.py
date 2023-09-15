@@ -235,6 +235,8 @@ async def who_solved(channel: TextChannel, chall: Challenge, Session) -> None:
         chall = session.merge(chall)
 
         for auteur in chall.solvers:
+            if auteur is None:
+                continue
             message += f' • • • {escape_markdown(auteur.username)}\n'
 
 
