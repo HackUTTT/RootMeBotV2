@@ -30,7 +30,7 @@ class DatabaseManager():
         self.rootme_api = rootme_api
         self.notification_manager = notification_manager
 
-        self.engine = create_engine(f"sqlite://{database_path}", connect_args={'timeout': 15}, pool_size=10, max_overflow=20)
+        self.engine = create_engine(f"sqlite://{database_path}", connect_args={'timeout': 15}, pool_size=100, max_overflow=50)
         Base.metadata.create_all(bind=self.engine)
 
         self.session_maker = sessionmaker(self.engine, expire_on_commit=False)
@@ -105,7 +105,10 @@ class DatabaseManager():
         """Returns all users in database in the form of Auteur"""
 
         with self.session_maker.begin() as session: # type: ignore
-            users = session.query(Auteur).all()
+            sql_cmd = f"select username from auteurs;"
+
+            users = session.execute(text(sql_cmd)).fetchall()
+            #users = session.query(Auteur).all()
 
         return users
 
@@ -334,6 +337,25 @@ class DatabaseManager():
         except Exception as e:
             print(e)
         return scoreboard
+
+    async def get_val_range(self, start):
+        """Get all flag in a time range"""
+        try:
+            with self.session_maker.begin() as session: # type: ignore
+                #sql_cmd = f"select a.username,c.score,SUBSTR(v.date,0,11) from validations as v,auteurs as a, challenges as c where SUBSTR(v.date,0,11)>='{start}' and v.auteur_id==a.idx and v.challenge_id==c.idx ;"
+                sql_cmd = f"select a.username,sum(c.score),SUBSTR(v.date,0,11) from validations as v,auteurs as a, challenges as c where SUBSTR(v.date,0,11)>='{start}' and v.auteur_id==a.idx and v.challenge_id==c.idx group by 1,3;"
+                print(sql_cmd)
+                val = session.execute(text(sql_cmd)).fetchall()
+            #print('sc2',val)
+        except Exception as e:
+            print(e)
+        return val
+
+    async def get_val_range_sum(self, start):
+        with self.session_maker.begin() as session:
+            sql_cmd = f"select a.username,sum(c.score),SUBSTR(v.date,0,11) from validations as v,auteurs as a, challenges as c where SUBSTR(v.date,0,11)>='{start}' and v.auteur_id==a.idx and v.challenge_id==c.idx group by 1;"
+            val = session.execute(text(sql_cmd)).fetchall()
+        return val
 
     async def remove_scoreboard(self, name: str) -> bool:
         """Removes a scoreboard"""

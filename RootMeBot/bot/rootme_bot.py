@@ -10,6 +10,9 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands.context import Context
 from notify.manager import NotificationManager
+import matplotlib.pyplot as plt
+import datetime
+import numpy as np
 
 
 class RootMeBot():
@@ -191,6 +194,48 @@ class RootMeBot():
             print('Today')
             scoreboard = await self.database_manager.get_daily_scoreboard()
             await utils.daily_scoreboard(context.message.channel, scoreboard)
+        
+        @self.bot.command(description='Graph of evolution last n days')
+        @commands.check(self.after_init)
+        @self.check_channel()
+        async def graph(context: Context) -> None:
+            """<n days>"""
+            print('Graph')
+            args = self.get_command_args(context)
+            if len(args) < 1:
+                n_days = 7
+            else:
+                n_days = int(args[0])
+
+            start = (datetime.datetime.now()-datetime.timedelta(days=n_days)).date()
+            val = await self.database_manager.get_val_range(str(start))
+
+            try:
+                users = await self.database_manager.get_val_range_sum(str(start))
+                users.sort(key=lambda x: x[1], reverse=True)
+                users = users[:10]
+                #print(users)
+            
+
+                #list_user = ['lark', 'k8pl3r','Dvorhack']
+                plt.clf()
+                for user,_,_ in users:
+                    my_solves = [0]*(n_days+2)
+                    for player, score, date in val:
+                        if player == user:
+                            nth_day = (datetime.date.fromisoformat(date)-start).days
+                            my_solves[nth_day+1] = score
+                    my_solves = np.cumsum(my_solves)
+                    plt.plot(list(range(n_days+2)), my_solves, label = user)
+            
+            except Exception as e:
+                print(e)
+
+            plt.legend()
+            plt.title(f"Top 10 last {n_days} days")
+            #print(my_solves)
+            plt.savefig('/tmp/file.png')
+            await utils.show_image(context.message.channel)
 
 
         @self.bot.command(description='Add user by ID')

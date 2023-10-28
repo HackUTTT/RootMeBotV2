@@ -130,6 +130,12 @@ async def daily_scoreboard(channel: TextChannel, scoreboard) -> None:
     embed = discord.Embed(color=Color.SCOREBOARD_WHITE.value, title="Daily Scoreboard", description=message)
     await channel.send(embed=embed)
 
+async def show_image(channel: TextChannel) -> None:
+    embed = discord.Embed(color=Color.SCOREBOARD_WHITE.value)
+    file = discord.File("/tmp/file.png", filename="image.png")
+    embed.set_image(url="attachment://image.png")
+    await channel.send(file=file,embed=embed)
+
 async def scoreboard(channel: TextChannel, database_manager: DatabaseManager, name: str) -> None:
 
     sc = await database_manager.get_scoreboard(name)
