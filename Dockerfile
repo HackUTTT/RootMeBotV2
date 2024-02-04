@@ -5,4 +5,4 @@ RUN pip install -r /tmp/requirements.txt
 
 COPY ./RootMeBot /opt
 
-ENTRYPOINT ["python3", "/opt/main.py"]
+ENTRYPOINT ["python3", "-u", "/opt/main.py"]

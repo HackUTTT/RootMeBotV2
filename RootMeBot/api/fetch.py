@@ -138,8 +138,11 @@ class ApiRootMe():
         try:
             result = json.loads(self.requests[key]['result'])
         except JSONDecodeError:
-            print(f"Got invalid response > {self.requests[key]['result']}")
-            result = ''
+            if self.requests[key]['result'] == 'PREMIUM':
+                raise PremiumChallenge(0)
+            else:
+                print(f"Got invalid response > {self.requests[key]['result']}")
+                result = ''
 
         del self.requests[key]
 
