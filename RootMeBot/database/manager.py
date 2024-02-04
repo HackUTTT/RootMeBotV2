@@ -45,10 +45,7 @@ class DatabaseManager():
 
     async def add_challenge_to_db(self, idx: int, priority=1) -> Challenge:
         """Adds a Challenge to db from api"""
-        try:
-            challenge = await self.rootme_api.get_challenge_by_id(idx, priority)
-        except PremiumChallenge:
-            return Challenge()
+        challenge = await self.rootme_api.get_challenge_by_id(idx, priority)
 
         return challenge
 
@@ -190,7 +187,11 @@ class DatabaseManager():
 
             for validation in full_auteur.validation_aut:
                 if validation.validation_challenge.idx not in challs_id:
-                    new_c = await self.add_challenge_to_db(validation.validation_challenge.idx, 0)
+                    try:
+                        new_c = await self.add_challenge_to_db(validation.validation_challenge.idx, 0)
+                    except PremiumChallenge:
+                        print(f"Could not retreive premium challenge {idx}")
+                        continue
                     if new_c:
                         chall = session.merge(validation.validation_challenge)
                         session.delete(chall)
